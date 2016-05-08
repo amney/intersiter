@@ -1,0 +1,72 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,500,300);
+
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+.container {
+  background: url(media/login_background.jpg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+  min-height: 100%;
+  font-family: 'Roboto', sans-serif;
+  padding-bottom: 50px;
+}
+
+.centeredContainer{
+  composes: row from 'flexboxgrid';
+  composes: middle-lg from 'flexboxgrid';
+  composes: center-lg from 'flexboxgrid';
+  composes: middle-md from 'flexboxgrid';
+  composes: center-md from 'flexboxgrid';
+  min-height: 100%;
+}
+
+.nestedContainer {
+  composes: col-lg-8 from 'flexboxgrid';
+  composes: col-md-10 from 'flexboxgrid';
+  composes: col-sm-12 from 'flexboxgrid';
+  composes: col-xs-12 from 'flexboxgrid';
+  composes: start-lg from 'flexboxgrid';
+}
+
+.navContainer {
+  composes: col-lg-4 from 'flexboxgrid';
+  composes: col-sm-12 from 'flexboxgrid';
+  composes: col-xs-12 from 'flexboxgrid';
+}
+
+.configContainer {
+  composes: col-lg-8 from 'flexboxgrid';
+  composes: col-md-12 from 'flexboxgrid';
+  composes: col-sm-12 from 'flexboxgrid';
+  composes: col-xs-12 from 'flexboxgrid';
+}
+
+.marginHeader {
+  composes: row from 'flexboxgrid';
+  padding-top: 10px;
+  padding-bototm: 25px;
+  margin-top: 50px;
+  
+}
+
+.configTab {
+  composes: col-lg-12 from 'flexboxgrid';
+}
+
+.epgBox {
+  composes: col-lg-6 from 'flexboxgrid';
+  composes: col-md-12 from 'flexboxgrid';
+}
+
+.siteLocal {
+  composes: col-lg-12 from 'flexboxgrid';
+}
+
+.saveButton{
+  margin-top: 25px;
+}
