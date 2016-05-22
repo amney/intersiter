@@ -43,6 +43,7 @@ export function intersiter(state = initialState, action) {
     case SELECT_SITE:
       return {
         ...state,
+        globalConfig: false,
         site: action.site,
       }
     default:

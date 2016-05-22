@@ -1,12 +1,12 @@
-import React from 'react';
-import autobind from 'autobind-decorator';
+import React from 'react'
+import autobind from 'autobind-decorator'
 
 import ConfigTab from './ConfigTab'
 import MirroredEPG from './MirroredEPG'
 
 class GlobalConfig extends React.Component {
   constructor() {
-    super();
+    super()
   }
 
   render() {
@@ -14,9 +14,9 @@ class GlobalConfig extends React.Component {
       <ConfigTab title="Global Configuration">
           <MirroredEPG />
       </ConfigTab>
-    );
+    )
   }
 
 }
 
-export default GlobalConfig;
+export default GlobalConfig

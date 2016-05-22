@@ -13,6 +13,7 @@ import {lightBlue700, blueGrey400} from 'material-ui/styles/colors'
 import Navigation from './Navigation'
 import SitelocalConfig from './SitelocalConfig'
 import GlobalConfig from './GlobalConfig'
+import ConfigurationHelper from './ConfigurationHelper'
 
 import {container, centeredContainer,
   nestedContainer, navContainer, configContainer,

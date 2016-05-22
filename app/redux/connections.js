@@ -13,7 +13,7 @@ export function saveCon(siteId, con) {
 
 const initialState = {
   "b82b5ea1-4deb-4fc1-aa51-71df1166f502": {
-    address: "",
+    address: "192.168.0.10",
     username: "admin",
     password: "password",
     inAddr: "127.0.0.1",

@@ -12,7 +12,7 @@ import {siteLocal} from './style.css'
 
 import { connect } from 'react-redux'
 
-@connect(({intersiter, sites}) => ({reachable: sites[intersiter.site].reachable}))
+@connect(({intersiter, sites}) => ({reachable: sites[intersiter.site].reachable, siteName: sites[intersiter.site].name, site: intersiter.site}))
 class SitelocalConfig extends React.Component {
   constructor() {
     super()
@@ -21,12 +21,12 @@ class SitelocalConfig extends React.Component {
   render() {
     return (
       <Card style={{ minHeight: '100%'}}>
-        <CardHeader subtitle="Site-local Configuration - Site A" style={{height:40, paddingTop: 27}}/>
+        <CardHeader subtitle={`Site-local Configuration - ${this.props.siteName}`} style={{height:40, paddingTop: 27}}/>
                   <CardText>
                     <div className={row}  style={{marginBottom: 20}}>
                       { this.props.reachable ?
                         <div className={siteLocal} >
-                          <SharedEPGs /> 
+                          <SharedEPGs />
                           <Divider />
                         </div> : null
                       }
@@ -35,7 +35,7 @@ class SitelocalConfig extends React.Component {
                     <div className="row"  style={{marginBottom: 20}}>
                       { this.props.reachable ?
                         <div className={siteLocal} >
-                          <ConsumableEPGs /> 
+                          <ConsumableEPGs />
                           <Divider />
                         </div> : null
                       }

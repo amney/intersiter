@@ -7,27 +7,39 @@ import Formsy from 'formsy-react'
 import { FormsyCheckbox, FormsyDate, FormsyRadio, FormsyRadioGroup,
     FormsySelect, FormsyText, FormsyTime, FormsyToggle } from 'formsy-material-ui/lib'
 
+import {saveButton} from './style.css'
 import RaisedButton from 'material-ui/RaisedButton'
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as connectionCreators from '../redux/connections'
+import {setName} from '../redux/sites'
+
+var creators = connectionCreators.setName = setName
 
 @connect(({intersiter, connections, sites}) => ({site: intersiter.site, sitename: sites[intersiter.site].name,
   connection: connections[intersiter.site]}),
   (dispatch) => bindActionCreators(connectionCreators, dispatch))
 class ConnectionDetails extends React.Component {
 
+  constructor(){
+    super()
+    this.state = {
+      valid: false
+    }
+  }
+
   onValid(){
-    console.log("valid")
+    this.setState({valid: true})
   }
 
   onInvalid(){
-    console.log("invalid")
+    this.setState({valid: false})
   }
 
   onValidSubmit(data){
     console.log(data)
+    this.props.setName(this.props.site, data.sitename)
     this.props.saveCon(this.props.site, data)
   }
 
@@ -45,13 +57,15 @@ class ConnectionDetails extends React.Component {
         <FormsyText required name="inAddr" value={this.props.connection.inAddr} floatingLabelText="Intersite address" />
 
         <div style={ {  display: 'inline-block',  width: 200} }>
-          <FormsyToggle name="https" label="Use HTTPS?" defaultChecked={ this.props.connection.https } />
+          <FormsyToggle name="https" label="Use HTTPS?" checked={ this.props.connection.https } />
         </div>
 
         <br />
         <RaisedButton
           type="submit"
           label="Submit"
+          className={saveButton}
+          disabled={!this.state.valid}
         />
       </Formsy.Form>
       </ConfigSection>
