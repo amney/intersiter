@@ -1,9 +1,11 @@
+import {refreshSite} from './sites'
+
 const ADD_SITE = 'ADD_SITE'
 const DEL_SITE = 'DEL_SITE'
 const SAVE_CON = 'SAVE_CON'
 
 
-export function saveCon(siteId, con) {
+function save(siteId, con){
   return {
     type: SAVE_CON,
     siteId: siteId,
@@ -11,14 +13,14 @@ export function saveCon(siteId, con) {
   }
 }
 
-const initialState = {
-  "b82b5ea1-4deb-4fc1-aa51-71df1166f502": {
-    address: "192.168.0.10",
-    username: "admin",
-    password: "password",
-    inAddr: "127.0.0.1",
-    https: false,
+export function saveCon(siteId, con) {
+  return function(dispatch) {
+    dispatch(save(siteId, con))
+    dispatch(refreshSite(siteId))
   }
+}
+
+const initialState = {
 }
 export function connections(state = initialState, action) {
   switch (action.type) {
@@ -28,7 +30,7 @@ export function connections(state = initialState, action) {
           address: "",
           username: "admin",
           password: "password",
-          inAddr: "127.0.0.1",
+          inAddr: "",
           https: false,
         }
       }

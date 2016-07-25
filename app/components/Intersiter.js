@@ -8,12 +8,9 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme'
 
 import {Card, CardTitle, CardText, CardHeader, CardExpandable} from 'material-ui/Card'
 
-import {lightBlue700, blueGrey400} from 'material-ui/styles/colors'
+import {lightBlue700, green500} from 'material-ui/styles/colors'
 
 import Navigation from './Navigation'
-import SitelocalConfig from './SitelocalConfig'
-import GlobalConfig from './GlobalConfig'
-import ConfigurationHelper from './ConfigurationHelper'
 
 import {container, centeredContainer,
   nestedContainer, navContainer, configContainer,
@@ -23,7 +20,7 @@ import {row} from 'flexboxgrid'
 const muiTheme = getMuiTheme({
   palette: {
     accent1Color: lightBlue700,
-    primary1Color: blueGrey400
+    primary1Color: green500
   }
 })
 
@@ -41,7 +38,7 @@ class Intersiter extends React.Component {
                 <Navigation/>
               </div>
               <div className={configContainer}>
-                { this.props.globalConfig ? <GlobalConfig /> : <SitelocalConfig /> }
+                {this.props.children}
               </div>
             </div>
           </div>

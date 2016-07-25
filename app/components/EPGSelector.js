@@ -5,14 +5,17 @@ import Subheader from 'material-ui/Subheader'
 import ChevronRight from 'material-ui/svg-icons/navigation/chevron-right'
 import ChevronLeft from 'material-ui/svg-icons/navigation/chevron-left'
 import AutoComplete from 'material-ui/AutoComplete'
+import TextField from 'material-ui/TextField'
 import {row} from 'flexboxgrid'
 import {epgBox, saveButton} from './style.css'
+import autobind from 'autobind-decorator'
 
 class EPGSelector extends React.Component {
   constructor(){
     super()
     this.state = {
-      selected: {}
+      selected: {},
+      filter: ""
     }
   }
 
@@ -41,21 +44,23 @@ class EPGSelector extends React.Component {
   }
 
   render() {
-    //<AutoComplete style={ {  marginLeft: 7,  width: '100%'} } hintText="Search for EPG" filter={ AutoComplete.noFilter } dataSource={ ['EPGA', 'EPGB'] } />
     return (
       <div className={row}>
 
         <div className={epgBox}>
           <List>
             <Subheader>Available EPGs</Subheader>
+          <TextField style={{marginLeft: 15}} hintText="Filter" name="filter" onChange={(event) => this.setState({filter: event.target.value})}/>
+          <div style={{maxHeight: 360, overflow: 'scroll'}}>
               {Object.keys(this.props.choices).map((k) => {
                 var choice = this.props.choices[k]
-                if(!(k in this.state.selected)){
-                return (
-                  <ListItem key={k} primaryText={k} secondaryText={choice} rightIcon={ <ChevronRight /> } onClick={this.addChoice.bind(this, k, choice)} />
-                )
-                }
+                  if(!(k in this.state.selected) && (k.includes(this.state.filter))){
+                    return (
+                      <ListItem key={k} primaryText={choice.name} secondaryText={`${choice.tenant} - ${choice.ap}`} rightIcon={ <ChevronRight /> } onClick={this.addChoice.bind(this, k, choice)} />
+                    )
+                  }
               })}
+          </div>
           </List>
         </div>
 
@@ -65,7 +70,7 @@ class EPGSelector extends React.Component {
               {Object.keys(this.state.selected).map((k) => {
                 var choice = this.state.selected[k]
                 return (
-                  <ListItem key={k} primaryText={k} secondaryText={choice} leftIcon={ <ChevronLeft /> } onClick={this.removeChoice.bind(this, k)}/>
+                  <ListItem key={k} primaryText={choice.name} secondaryText={`${choice.tenant} - ${choice.ap}`} leftIcon={ <ChevronLeft /> } onClick={this.removeChoice.bind(this, k)}/>
                 )
               })}
           </List>

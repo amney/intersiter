@@ -12,44 +12,58 @@ import {siteLocal} from './style.css'
 
 import { connect } from 'react-redux'
 
-@connect(({intersiter, sites}) => ({reachable: sites[intersiter.site].reachable, siteName: sites[intersiter.site].name, site: intersiter.site}))
+@connect(({intersiter, sites}) => ({sites, idx: intersiter.site}))
 class SitelocalConfig extends React.Component {
   constructor() {
     super()
   }
 
   render() {
-    return (
+
+    if(this.props.idx){
+      const site = this.props.sites[this.props.idx]
+      const reachable = site.reachable > 0
+      const siteName = site.name
+
+      return (
       <Card style={{ minHeight: '100%'}}>
-        <CardHeader subtitle={`Site-local Configuration - ${this.props.siteName}`} style={{height:40, paddingTop: 27}}/>
-                  <CardText>
-                    <div className={row}  style={{marginBottom: 20}}>
-                      { this.props.reachable ?
-                        <div className={siteLocal} >
-                          <SharedEPGs />
-                          <Divider />
-                        </div> : null
-                      }
-                    </div>
+        <CardHeader subtitle={`Site-local Configuration - ${siteName}`} style={{height:40, paddingTop: 27}}/>
+        <CardText>
+          <div className={row}  style={{marginBottom: 20}}>
+            { reachable ?
+              <div className={siteLocal} >
+                <SharedEPGs />
+                <Divider />
+              </div> : null
+            }
+          </div>
 
-                    <div className="row"  style={{marginBottom: 20}}>
-                      { this.props.reachable ?
-                        <div className={siteLocal} >
-                          <ConsumableEPGs />
-                          <Divider />
-                        </div> : null
-                      }
-                    </div>
+          <div className="row"  style={{marginBottom: 20}}>
+            { reachable ?
+              <div className={siteLocal} >
+                <ConsumableEPGs />
+                <Divider />
+              </div> : null
+            }
+          </div>
 
-                    <div className="row" style={{marginBottom: 20}}>
-                      <div className={siteLocal}>
-                        <ConnectionDetails />
-                      </div>
-                    </div>
+          <div className="row" style={{marginBottom: 20}}>
+            <div className={siteLocal}>
+              <ConnectionDetails />
+            </div>
+          </div>
 
-                  </CardText>
-                </Card>
+        </CardText>
+      </Card>
     )
+    }
+    else {
+      return (
+      <Card style={{ minHeight: '100%'}}>
+        <CardHeader subtitle={`Please choose a site from the left hand navigation`} style={{height:40, paddingTop: 27}}/>
+      </Card>
+      )
+    }
   }
 
 }

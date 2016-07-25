@@ -25,6 +25,7 @@ export function setSite(id) {
 
 const initialState = {
   globalConfig: true,
+  syncConfig: false,
   site: 0,
 }
 

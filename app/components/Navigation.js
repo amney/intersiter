@@ -1,5 +1,6 @@
 import React from 'react'
 import autobind from 'autobind-decorator'
+import { push } from 'react-router-redux'
 
 import Avatar from 'material-ui/Avatar'
 import IconButton from 'material-ui/IconButton'
@@ -14,12 +15,20 @@ import NearMe from 'material-ui/svg-icons/maps/near-me'
 import Done from 'material-ui/svg-icons/action/done'
 import Add from 'material-ui/svg-icons/content/add'
 import CloudUpload from 'material-ui/svg-icons/file/cloud-upload'
-import {green500} from 'material-ui/styles/colors'
+import CloudOff from 'material-ui/svg-icons/file/cloud-off'
+import {green500, grey400} from 'material-ui/styles/colors'
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as intersiterCreators from '../redux/intersiter'
 import * as sitesCreators from '../redux/sites'
+import {setSite} from '../redux/intersiter'
+import {refreshSite} from '../redux/sites'
+import {configIntersiters} from '../redux/sync'
+
+import {lightBlueA700} from 'material-ui/styles/colors'
+
+import Site from './Site'
 
 
 class Navigation extends React.Component {
@@ -45,7 +54,7 @@ class Navigation extends React.Component {
 
 export default Navigation
 
-@connect(({intersiter}) => ({site: intersiter.site}), (dispatch) => bindActionCreators(intersiterCreators, dispatch))
+@connect(({intersiter}) => ({site: intersiter.site}), (dispatch) => bindActionCreators({intersiterCreators, push}, dispatch))
 class Scope extends React.Component {
   constructor() {
     super()
@@ -55,7 +64,7 @@ class Scope extends React.Component {
     return (
       <List>
         <Subheader>Intersiter</Subheader>
-        <ListItem primaryText="Global Configuration" leftAvatar={ <Avatar icon={ <Public/> } /> } onClick={ this.props.setGlobalConfig } />
+        <ListItem primaryText="Global Configuration" leftAvatar={ <Avatar icon={ <Public/> } /> } onClick={ () => this.props.push('') } />
       </List>
     )
   }
@@ -63,8 +72,14 @@ class Scope extends React.Component {
 }
 
 
-@connect(({sites, connections}) => ({sites, connections}), (dispatch) => bindActionCreators(intersiterCreators, dispatch))
+@connect(({sites, connections}) => ({sites, connections}), (dispatch) => bindActionCreators({setSite, refreshSite, push}, dispatch))
 class Sites extends React.Component {
+
+  @autobind
+  setSite(id){
+    this.props.setSite(id)
+    this.props.push('/site')
+  }
 
   render() {
     return (
@@ -73,11 +88,7 @@ class Sites extends React.Component {
         {Object.keys(this.props.sites).map((k) => {
            var site = this.props.sites[k]
            var connection = this.props.connections[k]
-           return (<ListItem key={k} primaryText={site.name}
-                     secondaryText={connection.address}
-                     leftAvatar={ <Avatar icon={ <Done /> }
-                     backgroundColor={ green500 } /> }
-                     onClick={this.props.setSite.bind(this, k)} />)
+           return (<Site key={k} site={k} name={site.name} reachable={site.reachable} connection={connection} setSite={this.setSite} refreshSite={this.props.refreshSite} />)
          })}
         <AddSite />
       </List>
@@ -97,16 +108,43 @@ class AddSite extends React.Component {
 
 }
 
+@connect(({sync, sites}) => ({sync, sites}), (dispatch) => bindActionCreators({configIntersiters, push}, dispatch))
 class SaveConfigButton extends React.Component {
 
+  @autobind
   sync(){
     console.log('Syncing config')
+    this.props.configIntersiters()
+    this.props.push('sync')
   }
 
   render() {
+
+    const reducer = (reachable, key) => {
+      const site = this.props.sites[key]
+      return reachable && (site.reachable > 0)
+    }
+    const allReachable = Object.keys(this.props.sites).reduce(reducer, true)
+
+    var icon = <CloudOff />
+    var bg = grey400
+    var text = "Cannot Sync Configuration"
+    var subtitle = "Not all sites are currently reachable"
+
+    if(allReachable){
+      icon = <CloudUpload />
+      bg = lightBlueA700
+      text = "Sync Configuration"
+      subtitle = "Click to save and push configuration"
+    }
+
+
     return (
       <List>
-        <ListItem primaryText="Sync Confguration" secondaryText="Click to save and push configuration" leftAvatar={ <Avatar icon={ <CloudUpload /> } /> } onTouchTap={this.sync}/>
+        <ListItem onTouchTap={this.sync} primaryText={text}
+          disabled={!allReachable}
+          secondaryText={subtitle}
+          leftAvatar={ <Avatar backgroundColor={bg} icon={ icon } /> }/>
       </List>
     )
   }
