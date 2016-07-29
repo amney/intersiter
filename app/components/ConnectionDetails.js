@@ -83,7 +83,7 @@ class ConnectionDetails extends React.Component {
         <FormsyText required name="password" value={this.props.connection.password} floatingLabelText="Password" type="password" />
         <FormsyText required name="inAddr" value={this.props.connection.inAddr} floatingLabelText="Intersite address" />
 
-        <div style={ {  display: 'inline-block',  width: 200} }>
+        <div style={ {  display: 'inline-block',  width: 200, paddingLeft: 20} }>
           <FormsyToggle name="https" label="Use HTTPS?" checked={ this.props.connection.https } />
         </div>
 

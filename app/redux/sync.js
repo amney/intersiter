@@ -1,10 +1,12 @@
-import uuid from 'node-uuid'
 import axios from 'axios'
 
 // Listen for modified configuration
 const SAVE_EPGS = 'SAVE_EPGS'
 
+// Begin, increment, and finish a job
+const INCR_SITE_INDEX = 'INCR_SITE_INDEX'
 const CFG_INTERSITERS_REQ = 'CFG_INTERSITERS_REQ'
+const CFG_INTERSITERS_DONE = 'CFG_INTERSITERS_DONE'
 
 // Site Reachability
 const B_SITE_REACH = 'B_SR'
@@ -21,11 +23,6 @@ const B_PSH_C = 'B_PC'
 const PC_REQ = 'PC_REQ'
 const PC_RESP = 'PC_RESP'
 const PC_ERROR = 'PC_ERROR'
-
-const INCR_SITE_INDEX = 'INCR_SITE_INDEX'
-
-const CFG_INTERSITERS_DONE = 'CFG_INTERSITERS_DONE'
-
 
 function incrSiteIndex(){
   return {
@@ -64,12 +61,6 @@ function beginPushConf() {
   }
 }
 
-
-function doneGenerateConf() {
-  return {
-    type: B_CONF,
-  }
-}
 
 function stageConfigForSite(siteId, config){
   return {

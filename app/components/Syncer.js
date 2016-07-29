@@ -83,7 +83,7 @@ class Syncer extends React.Component {
                 <p>
                   Pushing the generated configuration to each multi-site tool instance
                 </p>
-                <Stepper activeStep={0} orientation="vertical">
+                <Stepper activeStep={this.props.sync.siteIndex} orientation="vertical">
                   {siteCards}
                 </Stepper>
             </StepContent>

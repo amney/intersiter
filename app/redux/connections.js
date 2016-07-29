@@ -36,7 +36,7 @@ export function connections(state = initialState, action) {
         [action.siteId]: {
           address: "",
           username: "admin",
-          password: "password",
+          password: "",
           inAddr: "",
           https: false,
         }
