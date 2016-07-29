@@ -23,7 +23,7 @@ import { bindActionCreators } from 'redux'
 import * as intersiterCreators from '../redux/intersiter'
 import * as sitesCreators from '../redux/sites'
 import {setSite} from '../redux/intersiter'
-import {refreshSite} from '../redux/sites'
+import {refreshSite, refreshSites} from '../redux/sites'
 import {configIntersiters} from '../redux/sync'
 
 import {lightBlueA700} from 'material-ui/styles/colors'
@@ -72,8 +72,11 @@ class Scope extends React.Component {
 }
 
 
-@connect(({sites, connections}) => ({sites, connections}), (dispatch) => bindActionCreators({setSite, refreshSite, push}, dispatch))
+@connect(({sites, connections}) => ({sites, connections}), (dispatch) => bindActionCreators({setSite, refreshSite, refreshSites, push}, dispatch))
 class Sites extends React.Component {
+  componentDidMount(){
+    setInterval(this.props.refreshSites, 60000)
+  }
 
   @autobind
   setSite(id){
@@ -124,16 +127,29 @@ class SaveConfigButton extends React.Component {
       const site = this.props.sites[key]
       return reachable && (site.reachable > 0)
     }
-    const allReachable = Object.keys(this.props.sites).reduce(reducer, true)
+
+    var allReachable = false
+
+    if(Object.keys(this.props.sites).length > 0) {
+      allReachable = Object.keys(this.props.sites).reduce(reducer, true)
+      }
+    else {
+      allReachable = false
+    }
+
+    if(this.props.sync.syncing) allReachable = false
+
 
     var icon = <CloudOff />
     var bg = grey400
     var text = "Cannot Sync Configuration"
-    var subtitle = "Not all sites are currently reachable"
+    var subtitle = this.props.sync.syncing ? "Synchronization in progress" : "Not all sites are currently reachable"
 
     if(allReachable){
       icon = <CloudUpload />
-      bg = lightBlueA700
+      if (this.props.sync.pendingChanges) {
+        bg = lightBlueA700
+      }
       text = "Sync Configuration"
       subtitle = "Click to save and push configuration"
     }

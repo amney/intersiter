@@ -14,7 +14,7 @@ import SyncProblem from 'material-ui/svg-icons/notification/sync-problem'
 class Site extends React.Component {
 
   componentDidMount(){
-    this.props.refreshSite(this.props.site)
+    //this.props.refreshSite(this.props.site)
   }
 
   render() {
@@ -23,7 +23,7 @@ class Site extends React.Component {
     var icon = <Done />
     var colour = green500
     switch(this.props.reachable){
-      case 0:
+      case 0 || 2:
         icon = (<Sync />)
         colour = orangeA200
         break

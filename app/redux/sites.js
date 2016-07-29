@@ -45,6 +45,16 @@ function refreshSiteError(siteId, json) {
 }
 
 
+export function refreshSites(){
+  return function(dispatch, getState){
+    console.log("Refreshing Sites")
+    const {connections, sites} = getState()
+    Object.keys(sites).map((siteId) => {
+      setTimeout(() => {dispatch(refreshSite(siteId))}, Math.floor((Math.random() * 500))
+      )
+    })
+  }
+}
 
 export function refreshSite(siteId) {
   return function(dispatch, getState){
@@ -59,8 +69,8 @@ export function refreshSite(siteId) {
     axios.post(`${con.https ? 'https' : 'http'}://${con.address}/api/aaaLogin.json`,{
         aaaUser: {
           attributes: {
-            name: "admin",
-            pwd: "ins3965!"
+            name: con.username,
+            pwd: con.password
           }
         }
       })
@@ -72,13 +82,12 @@ export function refreshSite(siteId) {
           console.log('Could not auth')
         } else {
           var token = result.aaaLogin.attributes.token
-          axios.defaults.headers.common["devcookie"] = token
         }
 
-        axios.get(`${con.https ? 'https' : 'http'}://${con.address}/api/node/class/fvAEPg.json`)
+        axios.get(`${con.https ? 'https' : 'http'}://${con.address}/api/node/class/fvAEPg.json`, {headers: {devcookie: token}})
         .then((response) => dispatch(refreshSiteEpgs(siteId, response.data.imdata)))
 
-        axios.get(`${con.https ? 'https' : 'http'}://${con.address}/api/node/class/l3extInstP.json`)
+        axios.get(`${con.https ? 'https' : 'http'}://${con.address}/api/node/class/l3extInstP.json`, {headers: {devcookie: token}})
         .then((response) => dispatch(refreshSiteExtEpgs(siteId, response.data.imdata)))
 			})
 			.catch((response) => {
@@ -130,7 +139,7 @@ export function sites(state = initialState, action) {
         ...state,
         [action.siteId]: {
           name: "New Site",
-          reachable: 0,
+          reachable: -1,
           sharedEpgs: {},
           consumableEpgs: {},
           epgs: [],
@@ -138,9 +147,9 @@ export function sites(state = initialState, action) {
         }
       }
     case DEL_SITE:
-      return {
-        ...state,
-      }
+      var nState = {...state}
+      delete nState[action.siteId]
+      return nState
     case SET_NAME:
       return {
         ...state,
@@ -158,14 +167,22 @@ export function sites(state = initialState, action) {
         }
       }
 
-    case RSITE_REQ:
+    case RSITE_REQ: {
+      const prevReachable = state[action.siteId].reachable
+      var reachable = 0
+
+      if(prevReachable > 0) {
+        reachable = 2
+      }
+
       return {
         ...state,
         [action.siteId]: {
           ...state[action.siteId],
-          reachable: 0,
+          reachable: reachable,
         }
       }
+    }
 
     case RSITE_EPGS:
       return {

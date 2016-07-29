@@ -20,6 +20,13 @@ export function saveCon(siteId, con) {
   }
 }
 
+export function deleteCon(siteId){
+  return {
+    type: DEL_SITE,
+    siteId: siteId,
+  }
+}
+
 const initialState = {
 }
 export function connections(state = initialState, action) {
@@ -36,9 +43,9 @@ export function connections(state = initialState, action) {
       }
       )
     case DEL_SITE:
-      return {
-        ...state,
-      }
+      var nState = {...state}
+      delete nState[action.siteId]
+      return nState
     case SAVE_CON:
       return Object.assign({}, state, {
         [action.siteId]: action.con

@@ -15,7 +15,8 @@ class EPGSelector extends React.Component {
     super()
     this.state = {
       selected: {},
-      filter: ""
+      filter: "",
+      pendingChanges: false,
     }
   }
 
@@ -26,17 +27,18 @@ class EPGSelector extends React.Component {
   addChoice(key, choice){
     var selected = this.state.selected
     selected[key] = choice
-    this.setState({selected})
+    this.setState({selected, pendingChanges: true})
   }
 
   removeChoice(key){
     var selected = this.state.selected
     delete selected[key]
-    this.setState({selected})
+    this.setState({selected, pendingChanges: true})
   }
 
   onSave(){
     this.props.onSave(this.state.selected)
+    this.setState({pendingChanges: false})
   }
 
   componentWillReceiveProps(nextProps){
@@ -51,7 +53,7 @@ class EPGSelector extends React.Component {
           <List>
             <Subheader>Available EPGs</Subheader>
           <TextField style={{marginLeft: 15}} hintText="Filter" name="filter" onChange={(event) => this.setState({filter: event.target.value})}/>
-          <div style={{maxHeight: 360, overflow: 'scroll'}}>
+          <div style={{maxHeight: 300, overflow: 'scroll'}}>
               {Object.keys(this.props.choices).map((k) => {
                 var choice = this.props.choices[k]
                   if(!(k in this.state.selected) && (k.includes(this.state.filter))){
@@ -76,7 +78,7 @@ class EPGSelector extends React.Component {
           </List>
         </div>
 
-        <RaisedButton label="Save" className={saveButton} onClick={this.onSave.bind(this)}/>
+        <RaisedButton label="Save" className={saveButton} onClick={this.onSave.bind(this)} primary={this.state.pendingChanges}/>
       </div>
       )
   }

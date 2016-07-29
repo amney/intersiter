@@ -7,7 +7,7 @@ class ConfigSection extends React.Component {
     return (
       <div>
           <CardHeader title={this.props.title} subtitle={this.props.subtitle} />
-          <CardText expandable={true}>
+          <CardText>
               {this.props.children}
           </CardText>
       </div>

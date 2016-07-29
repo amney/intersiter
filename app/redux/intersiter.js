@@ -1,20 +1,5 @@
-const SET_GLOBAL_CONFIG = 'GLOBAL_CONFIG'
-const SET_LOCAL_CONFIG = 'LOCAL_CONFIG'
 const SELECT_SITE = 'SELECT_SITE'
-
-export function setGlobalConfig() {
-  return {
-    type: SET_GLOBAL_CONFIG,
-    global: true,
-  }
-}
-
-export function setLocalConfig() {
-  return {
-    type: SET_LOCAL_CONFIG,
-    global: false,
-  }
-}
+const DEL_SITE = 'DEL_SITE'
 
 export function setSite(id) {
   return {
@@ -24,28 +9,20 @@ export function setSite(id) {
 }
 
 const initialState = {
-  globalConfig: true,
-  syncConfig: false,
   site: 0,
 }
 
 export function intersiter(state = initialState, action) {
   switch (action.type) {
-    case SET_GLOBAL_CONFIG:
-      return {
-        ...state,
-        globalConfig: true,
-      }
-    case SET_LOCAL_CONFIG:
-      return {
-        ...state,
-        globalConfig: false,
-      }
     case SELECT_SITE:
       return {
         ...state,
-        globalConfig: false,
         site: action.site,
+      }
+    case DEL_SITE:
+      return {
+        ...state,
+        site: 0,
       }
     default:
       return state

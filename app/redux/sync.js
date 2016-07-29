@@ -1,6 +1,9 @@
 import uuid from 'node-uuid'
 import axios from 'axios'
 
+// Listen for modified configuration
+const SAVE_EPGS = 'SAVE_EPGS'
+
 const CFG_INTERSITERS_REQ = 'CFG_INTERSITERS_REQ'
 
 // Site Reachability
@@ -104,18 +107,38 @@ function createConfigForSite(key, sites, connections){
     config: []
   }
 
+  var config = []
+
   var siteObj = {
     site:{
       name: site.name,
       ip_address: con.address,
       username: con.username,
       password: con.password,
-      use_https: con.https,
-      local: true
+      use_https: con.https ? 'True' : 'False',
+      local: 'True'
     }
   }
 
-  var exports = []
+  config.push(siteObj)
+
+  Object.keys(deltaSites).map((k) => {
+    var otherSite = sites[k]
+    var otherSiteCon = connections[k]
+
+    var  otherSiteObj = {
+      site:{
+        name: otherSite.name,
+        ip_address: otherSiteCon.address,
+        username: otherSiteCon.username,
+        password: otherSiteCon.password,
+        use_https: otherSiteCon.https ? 'True' : 'False',
+        local: 'False'
+      }
+    }
+
+    config.push(otherSiteObj)
+  })
 
   Object.keys(site.sharedEpgs).map((k) => {
     var epg = site.sharedEpgs[k]
@@ -165,13 +188,11 @@ function createConfigForSite(key, sites, connections){
       exportObj.export.remote_sites.push(remote_site)
     })
 
-    exports.push(exportObj)
+    config.push(exportObj)
   })
 
 
-  configObj.config.push(siteObj)
-  configObj.config.push(exports)
-
+  configObj.config = config
   console.log(configObj)
 
   return configObj
@@ -186,9 +207,14 @@ function pushConfig(id){
       var connection = connections[k]
       var config = sync.conf[k]
 
+      setTimeout(() => {
 
-      //TODO: Post the actual configuration here
-      axios.get('http://127.0.0.1:8080')
+      // Post the actual configuration here
+      axios.post(`http://${connection.inAddr}/config`, config,
+      {auth: {
+      username: 'admin',
+      password: 'acitoolkit'
+      }})
       .then((response) => {
         let result = response.data
         dispatch(incrSiteIndex())
@@ -202,8 +228,30 @@ function pushConfig(id){
         }
 			})
 			.catch((response) => {
-				dispatch(pushConfigError(id, response.data))
-			})
+				dispatch(pushConfigError(sync.sites[id], response.data))
+			})}, 1500)
+  }
+}
+
+function buildSite(id){
+  return function(dispatch, getState){
+      const {sites, sync, connections} = getState()
+      const k = sync.sites[id]
+
+      setTimeout(() => {
+      const config = createConfigForSite(k, sites, connections)
+      dispatch(stageConfigForSite(k, config))
+      dispatch(incrSiteIndex())
+
+      const nextId = id + 1
+      if(nextId < sync.sites.length)
+        {
+          dispatch(buildSite(nextId))
+        }
+      else {
+          dispatch(beginPushConf())
+          dispatch(pushConfig(0))
+      }}, 1500)
   }
 }
 
@@ -213,31 +261,25 @@ function doneSiteReachability(){
 
     // Generate configuration for each site
     dispatch(beginGenerateConf())
-    setTimeout(() => {
 
-    Object.keys(sites).map((k) => {
-      var site = sites[k]
-
-      const config = createConfigForSite(k, sites, connections)
-      dispatch(stageConfigForSite(k, config))
-      dispatch(incrSiteIndex())
-    })
-
-    // Push configuration to each site
-    dispatch(beginPushConf())
-    setTimeout(() => dispatch(pushConfig(0)), 2000)
-
-
-    }, 2000)
+    dispatch(buildSite(0))
   }
 }
 
 function testSite(id){
   return function(dispatch, getState){
-    const {sync} = getState()
+      const {sync, connections} = getState()
+      const k = sync.sites[id] 
+      var connection = connections[k]
 
-      //TODO: Test the API is reachable
-      axios.get('http://127.0.0.1:8080')
+    setTimeout(() => {
+
+    // Test that the interister is up
+    axios.get(`http://${connection.inAddr}/config`,
+      {auth: {
+      username: 'admin',
+      password: 'acitoolkit'
+      }})
       .then((response) => {
         let result = response.data
         dispatch(incrSiteIndex())
@@ -251,8 +293,9 @@ function testSite(id){
         }
 			})
 			.catch((response) => {
-				dispatch(siteReachError(id, response.data))
+				dispatch(siteReachError(sync.sites[id], response.data))
 			})
+      }, 1500)
   }
 }
 
@@ -268,19 +311,21 @@ export function configIntersiters() {
 
     // Check that each site is reachable
     dispatch(beginSiteReachability())
-    setTimeout(() => dispatch(testSite(0)), 2000)
+    dispatch(testSite(0))
   }
 }
 
 const initialState = {
   syncing: false,
+  pendingChanges: false,
   siteId: null,
   siteIndex: 0,
   stage: 0,
   json: null,
   error: false,
   sites: [],
-  conf: {}
+  conf: {},
+  message: ""
 }
 
 export function sync(state = initialState, action) {
@@ -289,14 +334,18 @@ export function sync(state = initialState, action) {
       return {
         ...state,
         syncing: true,
+        error: false,
+        message: "",
         stage: 0,
+        siteIndex: 0,
         sites: action.sites
       }
     case CFG_INTERSITERS_DONE:
       return {
         ...state,
         stage: 3,
-        syncing: false
+        syncing: false,
+        pendingChanges: false,
       }
     case INCR_SITE_INDEX:
       var curIdx = state.siteIndex
@@ -307,6 +356,13 @@ export function sync(state = initialState, action) {
       return {
         ...state,
         siteIndex: newIdx
+      }
+
+
+    case SAVE_EPGS:
+      return {
+        ...state,
+        pendingChanges: true,
       }
 
 
@@ -336,13 +392,17 @@ export function sync(state = initialState, action) {
     case SR_ERROR:
       return {
         ...state,
+        syncing: false,
+        siteId: action.siteId,
         error: true,
-        message: 'Failed to reach site'
+        message: 'Failed to reach intersite tool'
       }
 
     case PC_ERROR:
       return {
         ...state,
+        syncing: false,
+        siteId: action.siteId,
         error: true,
         message: 'Failed to push configuration'
       }

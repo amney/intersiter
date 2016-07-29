@@ -1,12 +1,8 @@
 import React from 'react'
 import autobind from 'autobind-decorator'
-
 import ConfigSection from './ConfigSection'
-import EPGSelector from './EPGSelector'
-
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import * as sitesCreators from '../redux/sites'
 
 import {
   Step,
@@ -15,9 +11,9 @@ import {
   StepContent,
 } from 'material-ui/Stepper'
 
-const TENANT_MATCH = /tn-(.+)/i
-const AP_MATCH = /ap-(.+)/i
-const EPG_MATCH = /epg-(.+)/i
+import WarningIcon from 'material-ui/svg-icons/alert/warning'
+import {red500} from 'material-ui/styles/colors'
+
 
 @connect(({sync, sites, connections}) => ({sync, sites, connections}), (dispatch) => bindActionCreators({}, dispatch))
 class Syncer extends React.Component {
@@ -26,8 +22,28 @@ class Syncer extends React.Component {
     const siteCards = this.props.sync.sites.map((k) => {
                 var site = this.props.sites[k]
                 var connection = this.props.connections[k]
+                var error = false
+                if(this.props.sync.error){
+                  if(this.props.sync.siteId == k){
+                    return (<Step key={k}>
+                      <StepLabel
+                        icon={<WarningIcon color={red500} />}
+                        style={{color: red500}} >
+                        {site.name} failed
+                      </StepLabel>
+                      <StepContent transitionDuration={0}>
+                        <p>
+                          {connection.address}
+                          <br />
+                          <br />
+                          <strong>{this.props.sync.message}</strong>
+                        </p>
+                      </StepContent>
+                    </Step>)
+                  }
+                }
                 return (<Step key={k}>
-                  <StepLabel>{site.name}</StepLabel>
+                  <StepLabel>{site.name} {error ? "Failed!" : null} </StepLabel>
                   <StepContent>
                     <p>
                       {connection.address}
@@ -45,6 +61,9 @@ class Syncer extends React.Component {
                 Checking that each ACI site has an multi-site tool instance
                 running and that it is reachable from the intersiter tool.
               </p>
+              <Stepper activeStep={this.props.sync.siteIndex} orientation="vertical">
+                {siteCards}
+              </Stepper>
             </StepContent>
           </Step>
           <Step>
