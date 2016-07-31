@@ -3,7 +3,6 @@
 */
 
 import React from 'react'
-import $ from 'jquery'
 import helpers from '../helpers'
 
 import Divider from 'material-ui/Divider'
