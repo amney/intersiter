@@ -90,9 +90,9 @@ export function refreshSite(siteId) {
         axios.get(`${con.https ? 'https' : 'http'}://${con.address}/api/node/class/l3extInstP.json`, {headers: {devcookie: token}})
         .then((response) => dispatch(refreshSiteExtEpgs(siteId, response.data.imdata)))
 			})
-			.catch((response) => {
-				dispatch(refreshSiteError(siteId, response.data))
-			})
+      .catch((response) => {
+        dispatch(refreshSiteError(siteId, response.data))
+      })
 
   }
 }

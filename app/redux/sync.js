@@ -202,10 +202,12 @@ function pushConfig(id){
 
       // Post the actual configuration here
       axios.post(`http://${connection.inAddr}/config`, config,
-      {auth: {
-      username: 'admin',
-      password: 'acitoolkit'
-      }})
+      {
+        auth: {
+          username: 'admin',
+          password: 'acitoolkit'
+        }
+      })
       .then((response) => {
         let result = response.data
         dispatch(incrSiteIndex())
@@ -218,9 +220,9 @@ function pushConfig(id){
             dispatch(configIntersitersDone())
         }
 			})
-			.catch((response) => {
-				dispatch(pushConfigError(sync.sites[id], response.data))
-			})}, 1500)
+      .catch((response) => {
+        dispatch(pushConfigError(sync.sites[id], response.data))
+      })}, 1500)
   }
 }
 
@@ -267,10 +269,12 @@ function testSite(id){
 
     // Test that the interister is up
     axios.get(`http://${connection.inAddr}/config`,
-      {auth: {
-      username: 'admin',
-      password: 'acitoolkit'
-      }})
+      {
+        auth: {
+          username: 'admin',
+          password: 'acitoolkit'
+        }
+      })
       .then((response) => {
         let result = response.data
         dispatch(incrSiteIndex())
@@ -283,9 +287,9 @@ function testSite(id){
             dispatch(doneSiteReachability())
         }
 			})
-			.catch((response) => {
-				dispatch(siteReachError(sync.sites[id], response.data))
-			})
+      .catch((response) => {
+        dispatch(siteReachError(sync.sites[id], response.data))
+      })
       }, 1500)
   }
 }
