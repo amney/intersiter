@@ -1,5 +1,4 @@
 import React from 'react'
-import h from '../helpers'
 import reactMixin from 'react-mixin'
 import { connect } from 'react-redux'
 
